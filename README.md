@@ -46,14 +46,14 @@ I designed and built Contender end to end. It started as Propify, my earlier NBA
 ## How it works
 
 ```mermaid
-flowchart LR
-    A[stats.nba.com<br/>schedules & box scores] -->|ingest + version| B[(Postgres store<br/>immutable snapshots)]
-    U[User selects player,<br/>game, market, line] --> W[Next.js app]
+flowchart TB
+    U[User picks player, game,<br/>market, and line] --> W[Next.js app]
     W -->|authenticated request| API[FastAPI service]
     API -->|queue job| J[Analysis worker]
-    J --> B
+    A[stats.nba.com schedules<br/>and box scores] -->|ingest + version| B[(Postgres store)]
+    B --> J
     J -->|versioned result| API
-    API -->|saved, immutable| H[History & parlays]
+    API --> H[Saved history<br/>and parlays]
 ```
 
 The web app never computes analyses in the browser. It sends an authenticated request, the API queues a job, and a worker builds the result from data Contender has already ingested and versioned. Finished results come back as complete, versioned envelopes that can be saved and reopened.
